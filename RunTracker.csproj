@@ -4,7 +4,7 @@
     <TargetFramework>netstandard21</TargetFramework>
     <AssemblyName>RunTracker</AssemblyName>
     <Description>A run tracker for The Bazaar</Description>
-    <Version>0.0.3</Version>
+    <Version>0.0.1</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
