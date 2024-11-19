@@ -93,7 +93,6 @@ public class Plugin : BaseUnityPlugin
             Directory.CreateDirectory(outputDir);
 
             RunInfo.Serializer test = new RunInfo.Serializer();
-            Console.WriteLine(test.SerializeToJson(runInfo));
             long unixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             string filename = $"{unixTimestamp}.json";
             string filePath = Path.Combine(outputDir, filename);
