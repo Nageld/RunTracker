@@ -8,6 +8,10 @@
   - Download the [latest release](https://github.com/Nageld/RunTracker/releases)  
   - Extract it in `BepInEx\plugins` (in your game files)
 
+## Usage
+- You can view your run summary images in `BepInEx\plugins\RunImages`
+- They follow the naming scheme `CHARACTER_TIMESTAMP.png`
+
 ## Uninstall
 - Go to your game folder and `BepInEx\plugins`
 - Delete `RunTracker.dll`
