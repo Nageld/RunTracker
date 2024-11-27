@@ -10,7 +10,7 @@
 
 ## Usage
 - You can view your run summary images in `BepInEx\plugins\RunImages`
-- They follow the naming scheme `CHARACTER_TIMESTAMP.png`
+- They follow the naming scheme `TIMESTAMP_CHARACTER.png`
 
 ## Uninstall
 - Go to your game folder and `BepInEx\plugins`
