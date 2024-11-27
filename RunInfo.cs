@@ -10,6 +10,7 @@ namespace RunTracker;
 
 public class RunInfo
 {
+    public string GameModeId;
     public String Character; 
     public List<SkillInfo> Skills;
     public List<CardInfo> Cards; 
@@ -17,6 +18,8 @@ public class RunInfo
     public uint Wins;
     public String Trophy;
     public int Day;
+    public int Level;
+    public double Health; //might not be useful to be double instead of int, would need to check
     
     
     public class SkillInfo
