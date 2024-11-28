@@ -19,7 +19,9 @@ public class RunInfo
     public String Trophy;
     public int Day;
     public int Level;
-    public double Health; //might not be useful to be double instead of int, would need to check
+    public int Health;
+    public bool? IsAbandoned;
+    public int Rating;
     
     
     public class SkillInfo
@@ -34,16 +36,16 @@ public class RunInfo
         public Guid TemplateId;
     }
     
-    public class Serializer
+    public static class Serializer
     {
-        public string SerializeToJson(RunInfo runInfo)
+        public static string SerializeToJson(object toconvert)//no need to have it as RunInfo type, here we can use it as anything
         {
             var settings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented, 
                 NullValueHandling = NullValueHandling.Ignore 
             };
-            return JsonConvert.SerializeObject(runInfo, settings);
+            return JsonConvert.SerializeObject(toconvert, settings);
         }
 
         public static RunInfo DeserializeFromJson(string json)

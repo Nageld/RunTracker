@@ -16,6 +16,8 @@ using System.Text;
 using BazaarGameShared.Domain.Core.Types;
 using System.Threading.Tasks;
 using BepInEx.Logging;
+using BazaarGameClient.Infra.SocketClient;
+using TheBazaar.ProfileData;
 
 namespace RunTracker;
 
@@ -25,6 +27,8 @@ public class Plugin : BaseUnityPlugin
     private readonly Harmony harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
     public static String CharacterName = "";
     internal static new ManualLogSource Logger;
+    public static bool? isAbandonned = null;
+
     private void Awake()
     {
         Logger = base.Logger;
@@ -35,6 +39,16 @@ public class Plugin : BaseUnityPlugin
 
     private void Start()
     {
+    }
+
+    [HarmonyPatch(typeof(SocketClient), "SendAbandonRun")]
+    class AbandonRun
+    {
+        [HarmonyPrefix]
+        static void Prefix()
+        {
+            isAbandonned = true;
+        }
     }
 
     [HarmonyPatch(typeof(EndOfRunSummaryController), "OnContinueButtonPressed")]
@@ -62,12 +76,15 @@ public class Plugin : BaseUnityPlugin
             runInfo.Wins = Data.Run.Victories;
             runInfo.Character = Data.Run.Player.Hero.ToString();
             CharacterName = Data.Run.Player.Hero.ToString();
-            runInfo.Health = (double)Data.Run.Player.Attributes[EPlayerAttributeType.Health];
+            runInfo.Health = (int)Data.Run.Player.Attributes[EPlayerAttributeType.Health];
             runInfo.Level = (int)Data.Run.Player.Attributes[EPlayerAttributeType.Level];
-            List<ICard> temp = player.Hand.GetItems();
-            runInfo.Cards = new List<RunInfo.CardInfo>();
             runInfo.Day = (int)Data.Run.Day;
-            foreach (var card in temp)
+            runInfo.Rating = Data.Rank.CurrentSeasonRank.Rating;
+            runInfo.IsAbandoned = isAbandonned;
+            isAbandonned = null;//reset
+            List<ICard> HandItems = player.Hand.GetItems();
+            runInfo.Cards = new List<RunInfo.CardInfo>();
+            foreach (var card in HandItems)
             {
                 RunInfo.CardInfo info = new RunInfo.CardInfo
                 {
@@ -76,9 +93,9 @@ public class Plugin : BaseUnityPlugin
                 };
                 runInfo.Cards.Add(info);
             }
-            List<ICard> temp2 = player.Stash.GetItems();
+            List<ICard> StashItems = player.Stash.GetItems();
             runInfo.Stash = new List<RunInfo.CardInfo>();
-            foreach (var card in temp2)
+            foreach (var card in StashItems)
             {
                 RunInfo.CardInfo info = new RunInfo.CardInfo
                 {
@@ -100,16 +117,16 @@ public class Plugin : BaseUnityPlugin
             }
             string outputDir = Path.Combine(Paths.PluginPath, "RunData");
             Directory.CreateDirectory(outputDir);
-
-            RunInfo.Serializer RunInfoSerializer = new RunInfo.Serializer();
             long unixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             string filename = $"{unixTimestamp}.json";
             string filePath = Path.Combine(outputDir, filename);
-            File.WriteAllText(filePath, RunInfoSerializer.SerializeToJson(runInfo));
+            string runInfoJson = RunInfo.Serializer.SerializeToJson(runInfo);
+            File.WriteAllText(filePath, runInfoJson);
             if(should_send_request)
             {
-                _ = PostRunInfo(RunInfoSerializer.SerializeToJson(runInfo));
+                _ = PostRunInfo(runInfoJson);
             }
+            //Logger.LogWarning(runInfoJson);
         }
     }
     static async Task PostRunInfo(string jsonContent)
